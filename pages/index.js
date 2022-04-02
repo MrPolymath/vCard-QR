@@ -34,6 +34,7 @@ export default function Home() {
     getVCardData(formData).then((data) => {
       console.log(data);
       const canvas = document.getElementById("canvas");
+      canvas.height = 150;
       // render the QR
       QRCode.toCanvas(canvas, data.vcard, function (error) {
         if (error) console.error(error);
@@ -43,7 +44,7 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-gray-800 text-gray-100 px-8 py-12">
+    <div className="bg-gray-800 text-gray-100 px-8 py-8 md:py-12">
       <Head>
         <title>vCard to QR</title>
         <meta
@@ -56,14 +57,14 @@ export default function Home() {
       {/* put the content of the page here */}
       <main>
         <div className="text-center w-full"></div>
-        <div className="max-w-screen-xl mt-24 px-8 grid gap-8 grid-cols-1 md:grid-cols-2 md:px-12 lg:px-16 xl:px-32 py-16 mx-auto bg-gray-100 text-gray-900 rounded-lg shadow-lg">
+        <div className="max-w-screen-xl md:mt-24 px-8 grid gap-8 grid-cols-1 md:grid-cols-2 md:px-12 lg:px-16 xl:px-32 py-8 md:py-16 mx-auto bg-gray-100 text-gray-900 rounded-lg shadow-lg">
           <div className="flex flex-col justify-between">
             <div>
               <h2 className="text-4xl lg:text-5xl font-bold leading-tight">
                 Generate a QR with your contact information
               </h2>
               <div className="mt-8">
-                <canvas id="canvas"></canvas>
+                <canvas id="canvas" style={{ height: 0 }}></canvas>
               </div>
             </div>
           </div>
@@ -126,6 +127,8 @@ export default function Home() {
                 placeholder=""
                 value={formData.email}
                 onChange={(e) => handleInputChange(e, "email")}
+                // we force the UI to not show capital letters for email
+                style={{ textTransform: "lowercase" }}
               />
             </div>
             <div className="mt-8">
