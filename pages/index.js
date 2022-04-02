@@ -1,9 +1,9 @@
 import Head from "next/head";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import QRCode from "qrcode";
 
 export default function Home() {
-  // we create a hook to handle the state of the form data
+  // We create a hook to handle the state of the form data
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -11,6 +11,35 @@ export default function Home() {
     phone: "",
     email: "",
   });
+  // we create a hook to know if there's existing localStorage data
+  const [hasLocalStorageFormData, setHasLocalStorageFormData] = useState(false);
+
+  useEffect(() => {
+    // Check if there's form data stored in localStorage
+    const storedFormData = JSON.parse(localStorage.getItem("formData"));
+    // If there is, we update the formData state and we render the QR
+    if (storedFormData) {
+      setFormData(
+        JSON.parse(localStorage.getItem("formData")) || {
+          firstName: "",
+          lastName: "",
+          company: "",
+          phone: "",
+          email: "",
+        }
+      );
+      // we also set the flag to true
+      setHasLocalStorageFormData(true);
+    }
+  }, []); // this only runs once because we pass an empty array
+
+  useEffect(() => {
+    // if there's form data loaded from localStorage, we should
+    // show the QR code.
+    if (hasLocalStorageFormData) {
+      handleFormSubmit();
+    }
+  }, [hasLocalStorageFormData]);
 
   const handleInputChange = (event, inputName) => {
     // we create a new object to store the new state
@@ -19,6 +48,8 @@ export default function Home() {
     newFormData[inputName] = event.target.value;
     // we update the state
     setFormData(newFormData);
+    // we also want to store the data in local storage
+    localStorage.setItem("formData", JSON.stringify(newFormData));
   };
 
   const getVCardData = async (params) => {
@@ -32,13 +63,13 @@ export default function Home() {
 
   const handleFormSubmit = () => {
     getVCardData(formData).then((data) => {
-      console.log(data);
+      // console.log(data);
       const canvas = document.getElementById("canvas");
       canvas.height = 150;
       // render the QR
       QRCode.toCanvas(canvas, data.vcard, function (error) {
         if (error) console.error(error);
-        console.log("success!");
+        // console.log("success!");
       });
     });
   };
